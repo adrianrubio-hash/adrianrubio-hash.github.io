@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Encarta Memoria - Pro</title>
+    <style>
+        :root {
+            --bg-beige: #e9e3a8;
+            --header-gray: #7d8471;
+            --text-brown: #8b4513;
+            --encarta-green: #5c6b53;
+            --box-border: #bdae82;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+            font-family: "Times New Roman", Times, serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            touch-action: manipulation;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 4 / 3;
+            background-color: var(--bg-beige);
+            background-image: url('background.png'); /* Fondo original de Encarta */
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        @media (max-height: 600px), (max-width: 600px) {
+            #game-container { aspect-ratio: auto; min-height: 100vh; }
+        }
+
+        .top-bar, .bottom-bar {
+            height: 30px;
+            background-color: var(--header-gray);
+            color: #eee;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 14px;
+            z-index: 10;
+        }
+
+        .top-bar { justify-content: flex-end; }
+        .bottom-bar { justify-content: space-between; }
+
+        .content-area {
+            padding: 10px 5%;
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1.title {
+            font-family: Arial, sans-serif;
+            font-size: clamp(30px, 8vw, 70px);
+            color: var(--encarta-green);
+            margin: 0;
+            letter-spacing: 0.1em;
+            border-bottom: 2px solid var(--encarta-green);
+            display: inline-block;
+            opacity: 0.8;
+        }
+
+        .level-indicator {
+            position: absolute;
+            right: 5%;
+            top: 0;
+            font-size: clamp(60px, 15vw, 110px);
+            color: rgba(189, 174, 130, 0.25);
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            pointer-events: none;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            margin-top: 10px;
+        }
+
+        .screen.active { display: flex; }
+
+        .instruction {
+            font-size: clamp(18px, 4vw, 28px);
+            color: var(--text-brown);
+            margin-bottom: 15px;
+        }
+
+        .instruction span { font-weight: bold; }
+
+        .letter-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-start;
+        }
+
+        .letter-box {
+            width: clamp(40px, 10vw, 75px);
+            height: clamp(55px, 14vw, 95px);
+            background: white;
+            border: 1px solid var(--box-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(24px, 8vw, 55px);
+            color: var(--text-brown);
+        }
+
+        /* Indicador de enfoque inspirado en image_2ad1d6.png */
+        .input-box.current-focus {
+            border-left: 4px solid var(--text-brown);
+        }
+
+        #mobile-input-trigger {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .educational-note {
+            font-size: clamp(14px, 3.5vw, 17px);
+            color: var(--text-brown);
+            line-height: 1.3;
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #fcf9e1;
+            border: 1px solid #a39673;
+            padding: 8px 16px;
+            font-family: serif;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .compact-grid .letter-box {
+            width: clamp(35px, 8vw, 50px);
+            height: clamp(45px, 11vw, 65px);
+            font-size: clamp(20px, 6vw, 40px);
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <input type="text" id="mobile-input-trigger" autocomplete="off" autocapitalize="characters">
+
+    <div class="top-bar">Introducción | Actividad</div>
+    
+    <div class="content-area">
+        <h1 class="title">MEMORIA</h1>
+        <div id="level-bg" class="level-indicator">3</div>
+
+        <!-- MOSTRAR LETRAS -->
+        <div id="screen-show" class="screen active">
+            <div class="instruction">Observa estas letras con atención.</div>
+            <div id="box-show" class="letter-display"></div>
+        </div>
+
+        <!-- ENTRADA DE USUARIO -->
+        <div id="screen-input" class="screen">
+            <div class="instruction"><span>Escribe las letras</span> (puedes borrar si te equivocas).</div>
+            <div id="box-input" class="letter-display" onclick="focusInput()"></div>
+        </div>
+
+        <!-- ÉXITO -->
+        <div id="screen-success" class="screen">
+            <div class="instruction"><span>¡Correcto!</span> Has recordado la secuencia.</div>
+            <div id="box-success" class="letter-display"></div>
+            <button onclick="advanceLevel()">Continuar</button>
+        </div>
+
+        <!-- ERROR (Inspirado en image_2acdf7.png) -->
+        <div id="screen-failure" class="screen">
+            <div style="margin-bottom:10px">
+                <div class="instruction" style="font-size:18px">No es del todo correcto. Escribiste:</div>
+                <div id="box-failure-typed" class="letter-display compact-grid"></div>
+            </div>
+            <div style="margin-bottom:10px">
+                <div class="instruction" style="font-size:18px">Las letras eran:</div>
+                <div id="box-failure-correct" class="letter-display compact-grid"></div>
+            </div>
+            <div class="educational-note">
+                Esta actividad demuestra una limitación de la memoria a corto plazo.<br>
+                <span>La mayoría de las personas retienen unos siete elementos (±2).</span>
+            </div>
+            <button id="retry-btn" onclick="initGame()">Intentar de nuevo</button>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <span>Créditos |</span>
+        <span onclick="location.reload()" style="cursor:pointer">Reiniciar</span>
+    </div>
+</div>
+
+<script>
+    let currentLevel = 3;
+    let targetSeq = [];
+    let userSeq = [];
+    const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const inputTrigger = document.getElementById('mobile-input-trigger');
+
+    function setView(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(`screen-${id}`).classList.add('active');
+    }
+
+    function render(containerId, count, data = [], cursor = false) {
+        const div = document.getElementById(containerId);
+        div.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            const b = document.createElement('div');
+            b.className = 'letter-box';
+            if (cursor && i === userSeq.length) b.classList.add('current-focus');
+            b.textContent = data[i] || "";
+            div.appendChild(b);
+        }
+    }
+
+    function focusInput() {
+        inputTrigger.focus();
+    }
+
+    function initGame() {
+        userSeq = [];
+        targetSeq = [];
+        inputTrigger.value = '';
+        document.getElementById('level-bg').textContent = currentLevel;
+        document.getElementById('retry-btn').textContent = `Reintentar nivel ${currentLevel}`;
+        
+        // Generar secuencia sin repeticiones
+        let available = alpha.split('');
+        for (let i = 0; i < currentLevel; i++) {
+            if (available.length === 0) break; // Límite de 26 letras
+            const randomIndex = Math.floor(Math.random() * available.length);
+            targetSeq.push(available.splice(randomIndex, 1)[0]);
+        }
+
+        render('box-show', currentLevel, targetSeq);
+        setView('show');
+
+        setTimeout(() => {
+            render('box-input', currentLevel, [], true);
+            setView('input');
+            focusInput();
+        }, 3000);
+    }
+
+    // Manejo de entrada y borrado
+    inputTrigger.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && userSeq.length > 0) {
+            userSeq.pop();
+            render('box-input', currentLevel, userSeq, true);
+        }
+    });
+
+    inputTrigger.addEventListener('input', (e) => {
+        const val = e.target.value.toUpperCase();
+        const char = val.charAt(val.length - 1);
+        
+        if (alpha.includes(char) && userSeq.length < currentLevel) {
+            userSeq.push(char);
+            render('box-input', currentLevel, userSeq, true);
+            
+            if (userSeq.length === currentLevel) {
+                inputTrigger.blur();
+                setTimeout(check, 400);
+            }
+        }
+        e.target.value = ''; // Limpiar para capturar siguiente tecla
+    });
+
+    function check() {
+        if (userSeq.join('') === targetSeq.join('')) {
+            render('box-success', currentLevel, targetSeq);
+            setView('success');
+        } else {
+            render('box-failure-typed', currentLevel, userSeq);
+            render('box-failure-correct', currentLevel, targetSeq);
+            setView('failure');
+        }
+    }
+
+    function advanceLevel() {
+        if (currentLevel < 26) {
+            currentLevel++;
+            initGame();
+        } else {
+            alert("¡Has alcanzado el límite máximo de letras únicas!");
+            location.reload();
+        }
+    }
+
+    window.onload = initGame;
+</script>
+</body>
+</html>
