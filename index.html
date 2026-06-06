@@ -1,316 +1,734 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Encarta Memoria - Pro</title>
-    <style>
-        :root {
-            --bg-beige: #e9e3a8;
-            --header-gray: #7d8471;
-            --text-brown: #8b4513;
-            --encarta-green: #5c6b53;
-            --box-border: #bdae82;
-        }
+  <meta charset="UTF-8">
+  <title>Museo Psicosocial del Encierro — Encarta Style</title>
+  <style>
+    /* --- ENCARTA / CLASSIC DIGITAL ENCYCLOPEDIA THEME --- */
+    :root {
+      --bg-app: #d4d0c8;          /* Classic Windows/Encarta grey */
+      --bg-panel: #ffffff;        /* White text areas */
+      --encarta-teal: #004040;    /* Classic deep teal header */
+      --encarta-blue: #000080;    /* Dark navy accent */
+      --text-main: #000000;
+      --text-muted: #404040;
+      --border-light: #ffffff;
+      --border-dark: #808080;
+      --border-shadow: #404040;
+    }
 
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #222;
-            font-family: "Times New Roman", Times, serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            touch-action: manipulation;
-        }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
 
-        #game-container {
-            width: 100%;
-            max-width: 800px;
-            aspect-ratio: 4 / 3;
-            background-color: var(--bg-beige);
-            background-image: url('background.png'); /* Fondo original de Encarta */
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            box-shadow: 0 0 30px rgba(0,0,0,0.7);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+    body {
+      background-color: var(--bg-app);
+      font-family: "MS Sans Serif", "Arial", sans-serif;
+      font-size: 13px;
+      color: var(--text-main);
+      padding: 10px;
+    }
 
-        @media (max-height: 600px), (max-width: 600px) {
-            #game-container { aspect-ratio: auto; min-height: 100vh; }
-        }
+    /* Windows 95 Style 3D Borders */
+    .inset-box {
+      border: 2px solid;
+      border-color: var(--border-dark) var(--border-light) var(--border-light) var(--border-dark);
+      background: var(--bg-panel);
+      padding: 10px;
+    }
 
-        .top-bar, .bottom-bar {
-            height: 30px;
-            background-color: var(--header-gray);
-            color: #eee;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            font-size: 14px;
-            z-index: 10;
-        }
+    .outset-box {
+      border: 2px solid;
+      border-color: var(--border-light) var(--border-dark) var(--border-dark) var(--border-light);
+    }
 
-        .top-bar { justify-content: flex-end; }
-        .bottom-bar { justify-content: space-between; }
+    /* Main Container */
+    .museo-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-app);
+      border: 2px solid;
+      border-color: var(--border-light) var(--border-dark) var(--border-dark) var(--border-light);
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    }
 
-        .content-area {
-            padding: 10px 5%;
-            flex-grow: 1;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
+    /* Encarta Header Banner */
+    .museo-header {
+      background: linear-gradient(90deg, var(--encarta-teal), #008080);
+      color: white;
+      padding: 12px 15px;
+      border-bottom: 2px solid var(--border-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        h1.title {
-            font-family: Arial, sans-serif;
-            font-size: clamp(30px, 8vw, 70px);
-            color: var(--encarta-green);
-            margin: 0;
-            letter-spacing: 0.1em;
-            border-bottom: 2px solid var(--encarta-green);
-            display: inline-block;
-            opacity: 0.8;
-        }
+    .header-left .museo-kicker {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #b0e0e0;
+      font-weight: bold;
+    }
 
-        .level-indicator {
-            position: absolute;
-            right: 5%;
-            top: 0;
-            font-size: clamp(60px, 15vw, 110px);
-            color: rgba(189, 174, 130, 0.25);
-            font-weight: bold;
-            font-family: Arial, sans-serif;
-            pointer-events: none;
-        }
+    .header-left .museo-title {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 26px;
+      font-weight: bold;
+      text-shadow: 1px 1px #002020;
+    }
 
-        .screen {
-            display: none;
-            flex-direction: column;
-            margin-top: 10px;
-        }
+    .header-left .museo-subtitle {
+      font-size: 12px;
+      color: #d0f0f0;
+      font-style: italic;
+    }
 
-        .screen.active { display: flex; }
+    .header-right-logo {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 24px;
+      font-weight: bold;
+      font-style: italic;
+      color: #ffffff;
+      border: 2px double #ffffff;
+      padding: 2px 10px;
+      background: var(--encarta-blue);
+    }
 
-        .instruction {
-            font-size: clamp(18px, 4vw, 28px);
-            color: var(--text-brown);
-            margin-bottom: 15px;
-        }
+    /* Layout Frame: Left Sidebar + Right Content */
+    .museo-workspace {
+      display: flex;
+      padding: 8px;
+      gap: 8px;
+      background: var(--bg-app);
+    }
 
-        .instruction span { font-weight: bold; }
+    /* Sidebar Navigation */
+    .museo-sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: #c0c0c0;
+      padding: 6px;
+      border: 2px solid;
+      border-color: var(--border-dark) var(--border-light) var(--border-light) var(--border-dark);
+    }
 
-        .letter-display {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: flex-start;
-        }
+    .sidebar-title {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: var(--encarta-teal);
+      border-bottom: 1px solid var(--border-dark);
+      padding-bottom: 2px;
+    }
 
-        .letter-box {
-            width: clamp(40px, 10vw, 75px);
-            height: clamp(55px, 14vw, 95px);
-            background: white;
-            border: 1px solid var(--box-border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: clamp(24px, 8vw, 55px);
-            color: var(--text-brown);
-        }
+    .museo-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-        /* Indicador de enfoque inspirado en image_2ad1d6.png */
-        .input-box.current-focus {
-            border-left: 4px solid var(--text-brown);
-        }
+    /* Media-Style Buttons */
+    .nav-btn {
+      text-align: left;
+      padding: 6px 8px;
+      font-size: 12px;
+      font-family: "MS Sans Serif", Arial, sans-serif;
+      background: #e0e0e0;
+      border: 1px solid;
+      border-color: var(--border-light) var(--border-dark) var(--border-dark) var(--border-light);
+      cursor: pointer;
+      color: #000000;
+    }
 
-        #mobile-input-trigger {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
+    .nav-btn:hover {
+      background: #f0f0f0;
+    }
 
-        .educational-note {
-            font-size: clamp(14px, 3.5vw, 17px);
-            color: var(--text-brown);
-            line-height: 1.3;
-            margin-top: 10px;
-        }
+    .nav-btn.active {
+      background: var(--encarta-blue);
+      color: white;
+      border-color: var(--border-dark) var(--border-light) var(--border-light) var(--border-dark);
+      font-weight: bold;
+    }
 
-        button {
-            background-color: #fcf9e1;
-            border: 1px solid #a39673;
-            padding: 8px 16px;
-            font-family: serif;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
+    /* Main Content Area */
+    .museo-content {
+      flex-grow: 1;
+      min-width: 0; /* Prevents flex items from bursting bounds */
+    }
 
-        .compact-grid .letter-box {
-            width: clamp(35px, 8vw, 50px);
-            height: clamp(45px, 11vw, 65px);
-            font-size: clamp(20px, 6vw, 40px);
-        }
-    </style>
+    .sala {
+      display: none;
+    }
+
+    .sala.visible {
+      display: block;
+    }
+
+    /* Article Headers */
+    .sala-header {
+      background: #e8e7e1;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-bottom: 2px dotted var(--border-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sala-num {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--encarta-blue);
+    }
+
+    .sala-nombre {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 22px;
+      font-weight: bold;
+      color: #800000; /* Classic dark red for article headings */
+    }
+
+    .sala-teoria {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .sala-emoji {
+      font-size: 24px;
+      background: #ffffff;
+      padding: 4px;
+      border: 1px solid var(--border-dark);
+    }
+
+    /* Encyclopedia Text Blocks */
+    .concepto-bloque {
+      margin-bottom: 12px;
+    }
+
+    .bloque-label, .pais-label, .ejemplo-label, .mensaje-label {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--encarta-teal);
+      margin-bottom: 4px;
+    }
+
+    .bloque-texto {
+      line-height: 1.5;
+      text-align: justify;
+    }
+
+    /* Multi-column layout for Atlas/Comparisons */
+    .realidad-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .pais-card {
+      background: #fcfbf7;
+      border: 1px solid var(--border-dark);
+      padding: 8px;
+    }
+
+    .pais-texto {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    /* Sidebar-style quote/callout blocks inside Encarta */
+    .ejemplo-bloque {
+      background: #f4f0e8;
+      border-left: 4px solid var(--encarta-teal);
+      padding: 8px;
+      margin-bottom: 12px;
+    }
+
+    .ejemplo-texto {
+      font-style: italic;
+    }
+
+    .mensaje-bloque {
+      background: #f0f4f4;
+      border: 1px dashed var(--encarta-blue);
+      padding: 8px;
+    }
+
+    .mensaje-texto {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    /* App Status Bar Footer */
+    .museo-footer {
+      background: var(--bg-app);
+      border-top: 2px solid var(--border-dark);
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+
+    .footer-enfoques {
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 70%;
+    }
+
+    .footer-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dots {
+      display: flex;
+      gap: 3px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #808080;
+      border: 1px solid #ffffff;
+      cursor: pointer;
+    }
+
+    .dot.active {
+      background: #00ff00; /* Glowing index light */
+      border-color: #004000;
+    }
+
+    .nav-arrows {
+      display: flex;
+      gap: 2px;
+    }
+
+    .arrow-btn {
+      padding: 2px 8px;
+      font-size: 11px;
+      font-family: "MS Sans Serif", Arial, sans-serif;
+      background: #e0e0e0;
+      border: 1px solid;
+      border-color: var(--border-light) var(--border-dark) var(--border-dark) var(--border-light);
+      cursor: pointer;
+    }
+
+    .arrow-btn:active:not(:disabled) {
+      border-color: var(--border-dark) var(--border-light) var(--border-light) var(--border-dark);
+    }
+
+    .arrow-btn:disabled {
+      color: #808080;
+      cursor: default;
+    }
+
+    /* Citation styles */
+    .cita {
+      color: var(--encarta-blue);
+      font-size: 11px;
+      cursor: default;
+      font-style: normal;
+    }
+
+    /* Bibliography section */
+    .bib-sala {
+      display: none;
+    }
+    .bib-sala.visible {
+      display: block;
+    }
+    .bib-section-title {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 16px;
+      font-weight: bold;
+      color: #800000;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border-dark);
+      padding-bottom: 4px;
+    }
+    .bib-subtitle {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--encarta-teal);
+      margin: 10px 0 4px;
+      text-transform: uppercase;
+    }
+    .bib-entry {
+      font-size: 12px;
+      line-height: 1.6;
+      margin-bottom: 6px;
+      padding-left: 20px;
+      text-indent: -20px;
+      text-align: justify;
+    }
+    .bib-note {
+      background: #f4f0e8;
+      border-left: 4px solid var(--encarta-teal);
+      padding: 6px 10px;
+      font-size: 11px;
+      font-style: italic;
+      margin-top: 14px;
+      color: var(--text-muted);
+    }
+  </style>
 </head>
 <body>
 
-<div id="game-container">
-    <input type="text" id="mobile-input-trigger" autocomplete="off" autocapitalize="characters">
+<div class="museo-container outset-box">
+  
+  <div class="museo-header">
+    <div class="header-left">
+      <p class="museo-kicker">Proyecto interactivo · Psicología Social</p>
+      <h1 class="museo-title">Museo Psicosocial del Encierro</h1>
+      <p class="museo-subtitle">El sistema carcelario en Ecuador y Argentina — Seis lecturas críticas</p>
+    </div>
+    <div class="header-right-logo" aria-hidden="true">
+      ENCARTA '98
+    </div>
+  </div>
 
-    <div class="top-bar">Introducción | Actividad</div>
+  <div class="museo-workspace">
     
-    <div class="content-area">
-        <h1 class="title">MEMORIA</h1>
-        <div id="level-bg" class="level-indicator">3</div>
+    <aside class="museo-sidebar">
+      <div class="sidebar-title">Índice de Salas</div>
+      <nav class="museo-nav" aria-label="Salas del museo">
+        <button class="nav-btn active" onclick="irSala(0)">I. Obediencia</button>
+        <button class="nav-btn" onclick="irSala(1)">II. Identidad rota</button>
+        <button class="nav-btn" onclick="irSala(2)">III. Indefensión</button>
+        <button class="nav-btn" onclick="irSala(3)">IV. Resistencia</button>
+        <button class="nav-btn" onclick="irSala(4)">V. Representaciones</button>
+        <button class="nav-btn" onclick="irSala(5)">VI. Espejo social</button>
+        <button class="nav-btn" onclick="irSala(6)" style="margin-top:10px; border-top:1px solid #808080; color:#800000;">&#128218; Bibliografía</button>
+      </nav>
+    </aside>
 
-        <!-- MOSTRAR LETRAS -->
-        <div id="screen-show" class="screen active">
-            <div class="instruction">Observa estas letras con atención.</div>
-            <div id="box-show" class="letter-display"></div>
+    <main class="museo-content inset-box">
+
+      <div class="sala visible" id="sala-0">
+        <div class="sala-header">
+          <div>
+            <p class="sala-num">Sala de Exposición I</p>
+            <h2 class="sala-nombre">Obediencia Institucional</h2>
+            <p class="sala-teoria">Influencia social — Obediencia, conformidad y normalización · Milgram, Zimbardo</p>
+          </div>
         </div>
 
-        <!-- ENTRADA DE USUARIO -->
-        <div id="screen-input" class="screen">
-            <div class="instruction"><span>Escribe las letras</span> (puedes borrar si te equivocas).</div>
-            <div id="box-input" class="letter-display" onclick="focusInput()"></div>
+        <div class="concepto-bloque">
+          <p class="bloque-label">Concepto Psicológico</p>
+          <p class="bloque-texto">Stanley Milgram demostró que las personas obedecen a figuras de autoridad incluso cuando las órdenes violan su conciencia moral <span class="cita">(Milgram, 1963)</span>. Philip Zimbardo, con el Experimento de la Prisión de Stanford (1971), mostró cómo los roles institucionales — guardia o preso — transforman rápidamente la conducta: los "guardias" adoptaron comportamientos abusivos y los "presos" asumieron sumisión <span class="cita">(Zimbardo, 2007)</span>. La normalización es el proceso por el cual lo excepcional (la violencia, la humillación) se vuelve rutinario dentro del sistema <span class="cita">(Haney et al., 1973)</span>.</p>
         </div>
 
-        <!-- ÉXITO -->
-        <div id="screen-success" class="screen">
-            <div class="instruction"><span>¡Correcto!</span> Has recordado la secuencia.</div>
-            <div id="box-success" class="letter-display"></div>
-            <button onclick="advanceLevel()">Continuar</button>
+        <div class="realidad-grid">
+          <div class="pais-card">
+            <p class="pais-label"> Ecuador</p>
+            <p class="pais-texto">En las cárceles ecuatorianas — Latacunga, Turi, Bellavista — las masacres de 2021–2022 expusieron una cadena de obediencia institucional: guardias que toleraron el armamento de bandas, funcionarios que normalizaron la violencia como "inevitable" <span class="cita">(Defensoría del Pueblo del Ecuador, 2022)</span>. El SNAI asumió competencias sin romper la lógica de mando que perpetuó el caos.</p>
+          </div>
+          <div class="pais-card">
+            <p class="pais-label">Argentina</p>
+            <p class="pais-texto">El servicio penitenciario bonaerense documenta décadas de obediencia institucional al maltrato: torturas sistematizadas en el Penal de Devoto y Olmos registradas por el CELS <span class="cita">(Centro de Estudios Legales y Sociales [CELS], 2020)</span>. Los agentes penitenciarios actuaban bajo la lógica del rol — "cumplía órdenes" — legitimando prácticas degradantes como norma operativa.</p>
+          </div>
         </div>
 
-        <!-- ERROR (Inspirado en image_2acdf7.png) -->
-        <div id="screen-failure" class="screen">
-            <div style="margin-bottom:10px">
-                <div class="instruction" style="font-size:18px">No es del todo correcto. Escribiste:</div>
-                <div id="box-failure-typed" class="letter-display compact-grid"></div>
-            </div>
-            <div style="margin-bottom:10px">
-                <div class="instruction" style="font-size:18px">Las letras eran:</div>
-                <div id="box-failure-correct" class="letter-display compact-grid"></div>
-            </div>
-            <div class="educational-note">
-                Esta actividad demuestra una limitación de la memoria a corto plazo.<br>
-                <span>La mayoría de las personas retienen unos siete elementos (±2).</span>
-            </div>
-            <button id="retry-btn" onclick="initGame()">Intentar de nuevo</button>
+        <div class="ejemplo-bloque">
+          <p class="ejemplo-label">Estudio de Caso / Símbolo</p>
+          <p class="ejemplo-texto">"Un guardia recién ingresado, sin historia de violencia, aprende en sus primeras semanas que gritar, humillar en la requisa e ignorar lesiones son 'protocolo'. En seis meses ha interiorizado el abuso como normalidad profesional. Stanford en escala real, sin terminar al séptimo día."</p>
         </div>
+
+        <div class="mensaje-bloque">
+          <p class="mensaje-label">Perspectiva Crítica</p>
+          <p class="mensaje-texto">¿Cuándo dejamos de ver la violencia carcelaria como "exceso individual" y la reconocemos como el producto sistemático de instituciones que enseñan a obedecer sin preguntar?</p>
+        </div>
+      </div>
+
+      <div class="sala" id="sala-1">
+        <div class="sala-header">
+          <div>
+            <p class="sala-num">Sala de Exposición II</p>
+            <h2 class="sala-nombre">La Identidad Rota</h2>
+            <p class="sala-teoria">Comparación social, disonancia cognitiva y estigmatización · Festinger, Goffman</p>
+          </div>
+        </div>
+
+        <div class="concepto-bloque">
+          <p class="bloque-label">Concepto Psicológico</p>
+          <p class="bloque-texto">Leon Festinger describe cómo nos comparamos socialmente para construir identidad <span class="cita">(Festinger, 1954)</span>. En prisión, la comparación con el "ciudadano libre" genera disonancia cognitiva permanente: la persona privada de libertad debe reconciliar su autoimagen previa con la identidad que el sistema le impone <span class="cita">(Festinger, 1957)</span>. Erving Goffman denominó "estigma" a la marca social que degrada al sujeto a una categoría inferior: el "preso" deja de ser persona para ser categoría <span class="cita">(Goffman, 1963)</span>. El "mundo total" de la institución carcelaria destruye el yo anterior mediante la despersonalización <span class="cita">(Goffman, 1961)</span>.</p>
+        </div>
+
+        <div class="realidad-grid">
+          <div class="pais-card">
+            <p class="pais-label"> Ecuador</p>
+            <p class="pais-texto">El sistema penitenciario ecuatoriano no cuenta con programas de rehabilitación sostenidos <span class="cita">(Ministerio de Justicia del Ecuador, 2019)</span>. Las personas en conflicto con la ley reciben un número, un uniforme, y una celda. Al salir, el estigma "ex-presidiario" clausura el acceso al empleo formal. La identidad rota no se repara extramuros.</p>
+          </div>
+          <div class="pais-card">
+            <p class="pais-label">Argentina</p>
+            <p class="pais-texto">Estudios del INECIP muestran que más del 70% de personas excarceladas en Buenos Aires no acceden a trabajo registrado en el primer año <span class="cita">(Instituto de Estudios Comparados en Ciencias Penales y Sociales [INECIP], 2021)</span>. El estigma opera como barrera estructural: empleadores, arrendatarios y servicios públicos filtran por antecedentes penales, convirtiendo la pena formal en pena social perpetua.</p>
+          </div>
+        </div>
+
+        <div class="ejemplo-bloque">
+          <p class="ejemplo-label">Estudio de Caso / Símbolo</p>
+          <p class="ejemplo-texto">"Frente a un espejo roto en la celda, los fragmentos devuelven imágenes distorsionadas. Ningún trozo refleja un rostro completo. Eso es la identidad bajo el encierro: fragmentada, mediada por la mirada institucional que nunca ve a la persona entera."</p>
+        </div>
+
+        <div class="mensaje-bloque">
+          <p class="mensaje-label">Perspectiva Crítica</p>
+          <p class="mensaje-texto">¿Una sociedad que no devuelve identidad después de la pena está rehabilitando personas, o fabricando reincidencia?</p>
+        </div>
+      </div>
+
+      <div class="sala" id="sala-2">
+        <div class="sala-header">
+          <div>
+            <p class="sala-num">Sala de Exposición III</p>
+            <h2 class="sala-nombre">Sala de la Indefensión</h2>
+            <p class="sala-teoria">Indefensión aprendida · Martin Seligman — Aprendizaje social · Albert Bandura</p>
+          </div>
+        </div>
+
+        <div class="concepto-bloque">
+          <p class="bloque-label">Concepto Psicológico</p>
+          <p class="bloque-texto">Martin Seligman demostró con sus experimentos que organismos expuestos a estímulos aversivos incontrolables aprenden a no intentar escapar, incluso cuando el escape es posible <span class="cita">(Seligman &amp; Maier, 1967)</span>. Esta "indefensión aprendida" se traduce en pasividad, depresión y renuncia a la acción <span class="cita">(Seligman, 1975)</span>. Complementariamente, Bandura mostró que la autoeficacia — la creencia en la propia capacidad de actuar — es indispensable para la conducta <span class="cita">(Bandura, 1977)</span>. El encierro sistemático destruye la autoeficacia: la persona aprende que sus acciones no tienen efecto sobre su entorno.</p>
+        </div>
+
+        <div class="realidad-grid">
+          <div class="pais-card">
+            <p class="pais-label"> Ecuador</p>
+            <p class="pais-texto">El hacinamiento en el sistema SNAI — centros al 200–300% de capacidad — impide cualquier planificación personal <span class="cita">(Servicio Nacional de Atención Integral [SNAI], 2022)</span>. Las personas no saben cuándo serán trasladadas, cuándo recibirán visitas, ni si los procesos judiciales avanzarán. Esa total imprevisibilidad genera indefensión institucionalizada.</p>
+          </div>
+          <div class="pais-card">
+            <p class="pais-label">Argentina</p>
+            <p class="pais-texto">La prisión preventiva prolongada — más del 50% de la población carcelaria en Argentina espera sentencia — destruye la autoeficacia antes de la condena <span class="cita">(CELS, 2022)</span>. El CELS documenta casos de personas en preventiva por más de cuatro años sin juicio oral, aprendiendo que el sistema judicial es completamente impermeable a sus acciones.</p>
+          </div>
+        </div>
+
+        <div class="ejemplo-bloque">
+          <p class="ejemplo-label">Estudio de Caso / Símbolo</p>
+          <p class="ejemplo-texto">"Un hombre presenta tres solicitudes de revisión de medida cautelar. Ninguna recibe respuesta en 18 meses. Al cuarto intento, ya no lo intenta. No es resignación: es aprendizaje. El sistema le enseñó que actuar es inútil."</p>
+        </div>
+
+        <div class="mensaje-bloque">
+          <p class="mensaje-label">Perspectiva Crítica</p>
+          <p class="mensaje-texto">¿Puede llamarse "rehabilitación" un sistema que entrena a las personas para no creer en su propia capacidad de transformarse?</p>
+        </div>
+      </div>
+
+      <div class="sala" id="sala-3">
+        <div class="sala-header">
+          <div>
+            <p class="sala-num">Sala de Exposición IV</p>
+            <h2 class="sala-nombre">Resistencia y Dignidad</h2>
+            <p class="sala-teoria">Psicología de la Liberación · Ignacio Martín-Baró — Construccionismo social · Kenneth Gergen</p>
+          </div>
+        </div>
+
+        <div class="concepto-bloque">
+          <p class="bloque-label">Concepto Psicológico</p>
+          <p class="bloque-texto">Ignacio Martín-Baró propuso una psicología al servicio de los oprimidos: no adaptar al individuo al sistema, sino transformar las estructuras que producen sufrimiento <span class="cita">(Martín-Baró, 1986)</span>. La "concientización" — reconocer la propia opresión como producto social, no como falla personal — es el primer acto liberador <span class="cita">(Martín-Baró, 1994)</span>. Kenneth Gergen, desde el construccionismo social, señala que la realidad social es construida relacionalmente: puede ser deconstruida y reconstruida a través del lenguaje, el relato y la acción colectiva <span class="cita">(Gergen, 1985)</span>.</p>
+        </div>
+
+        <div class="realidad-grid">
+          <div class="pais-card">
+            <p class="pais-label"> Ecuador</p>
+            <p class="pais-texto">Colectivos como "Mujeres de Frente" acompañan a familias de personas privadas de libertad, generando redes de apoyo que resisten la atomización del encierro. Dentro de los centros, organizaciones de internos han impulsado propuestas de mediación de conflictos — resistencia desde adentro.</p>
+          </div>
+          <div class="pais-card">
+            <p class="pais-label">Argentina</p>
+            <p class="pais-texto">La cooperativa textil del Penal de Marcos Paz (Buenos Aires) y los programas educativos universitarios del CUSAM en el Penal de San Martín son ejemplos de construcción de agencia colectiva. El 50% de quienes completan estudios universitarios en prisión no reinciden, frente al 80% de reincidencia general <span class="cita">(Universidad Nacional de General San Martín [UNSAM], 2019)</span>.</p>
+          </div>
+        </div>
+
+        <div class="ejemplo-bloque">
+          <p class="ejemplo-label">Estudio de Caso / Símbolo</p>
+          <p class="ejemplo-texto">"En un pabellón de máxima seguridad, un grupo de internos organiza un taller de escritura. Sin audiencia, sin publicación, sin salida. Solo el acto de narrar su historia en sus propias palabras. Ese gesto — recuperar la voz — es, en los términos de Martín-Baró, el inicio de la liberación."</p>
+        </div>
+
+        <div class="mensaje-bloque">
+          <p class="mensaje-label">Perspectiva Crítica</p>
+          <p class="mensaje-texto">La resistencia dentro del encierro no es subversión del orden: es evidencia de que la dignidad humana no puede ser completamente institucionalizada. ¿Por qué el Estado financia el encierro y recorta la educación?</p>
+        </div>
+      </div>
+
+      <div class="sala" id="sala-4">
+        <div class="sala-header">
+          <div>
+            <p class="sala-num">Sala de Exposición V</p>
+            <h2 class="sala-nombre">Representaciones del Delito</h2>
+            <p class="sala-teoria">Representaciones sociales · Serge Moscovici — Discriminación y estigmatización</p>
+          </div>
+        </div>
+
+        <div class="concepto-bloque">
+          <p class="bloque-label">Concepto Psicológico</p>
+          <p class="bloque-texto">Serge Moscovici demostró que el conocimiento cotidiano sobre fenómenos sociales — el crimen, la locura, la pobreza — se construye a través de representaciones sociales: esquemas colectivos que simplifican, anclan y objetivan la realidad para hacerla manejable <span class="cita">(Moscovici, 1961)</span>. La representación social del delincuente cumple una función ideológica: naturaliza la desigualdad, traslada responsabilidad estructural al individuo, y legitima el castigo como respuesta única <span class="cita">(Jodelet, 1986)</span>. El resultado es discriminación estructural: ciertos cuerpos (racializados, pobres, jóvenes) son precriminalizados <span class="cita">(Wacquant, 2000)</span>.</p>
+        </div>
+
+        <div class="realidad-grid">
+          <div class="pais-card">
+            <p class="pais-label"> Ecuador</p>
+            <p class="pais-texto">Las personas privadas de libertad en Ecuador son mayoritariamente hombres jóvenes, afrodescendientes o mestizos pobres, con bajo nivel educativo. La representación mediática del "narco" construida desde 2019 homogeneizó a la población carcelaria con las bandas, borrando los miles de casos de microtráfico de subsistencia y precriminalización de la pobreza.</p>
+          </div>
+          <div class="pais-card">
+            <p class="pais-label">Argentina</p>
+            <p class="pais-texto">El 70% de la población carcelaria argentina proviene de los quintiles de menor ingreso <span class="cita">(Ministerio de Justicia y Derechos Humanos de Argentina, 2022)</span>. Estudios del PNUD muestran que la representación social dominante del "delincuente" en medios de comunicación argentinos asocia crimen con pobreza y villa, invisibilizando el delito de cuello blanco y la criminalidad corporativa.</p>
+          </div>
+        </div>
+
+        <div class="ejemplo-bloque">
+          <p class="ejemplo-label">Estudio de Caso / Símbolo</p>
+          <p class="ejemplo-texto">"Dos personas cometen evasión fiscal y hurto de supermercado por hambre. Una aparece en las noticias de la noche como 'delincuente'. La otra recibe una multa administrativa y no pierde su libertad. La representación social decide quién es criminal — antes del juicio."</p>
+        </div>
+
+        <div class="mensaje-bloque">
+          <p class="mensaje-label">Perspectiva Crítica</p>
+          <p class="mensaje-texto">¿Las cárceles encierran a quienes hacen daño a la sociedad, o encierran a quienes la sociedad ya había decidido no ver como parte de sí misma?</p>
+        </div>
+      </div>
+
+      <div class="sala" id="sala-5">
+        <div class="sala-header">
+          <div>
+            <p class="sala-num">Sala de Exposición VI</p>
+            <h2 class="sala-nombre">El Espejo Social</h2>
+            <p class="sala-teoria">Gestalt y percepción social · Psicología social en contextos actuales</p>
+          </div>
+        </div>
+
+        <div class="concepto-bloque">
+          <p class="bloque-label">Concepto Psicológico</p>
+          <p class="bloque-texto">La psicología de la Gestalt mostró que percibimos totalidades, no partes aisladas: el "todo" es cualitativamente distinto de la suma de sus elementos <span class="cita">(Wertheimer, 1923)</span>. Aplicado al sistema carcelario, esto significa que la violencia, el hacinamiento, la corrupción y la reincidencia no son "fallas" separadas: son el sistema funcionando como fue diseñado <span class="cita">(Christie, 1993)</span>. La percepción social gestáltica nos exige ver la figura completa — la estructura de poder, pobreza y exclusión — en lugar de casos individuales. La psicología social contemporánea integra variables estructurales, interseccionales y de derechos humanos en el análisis del encierro <span class="cita">(Packer, 2008)</span>.</p>
+        </div>
+
+        <div class="realidad-grid">
+          <div class="pais-card">
+            <p class="pais-label"> Ecuador</p>
+            <p class="pais-texto">La crisis carcelaria ecuatoriana de 2021–2023 no fue un accidente: fue el resultado visible de décadas de desinversion, abandono del modelo rehabilitador post-2008, y la entrada del crimen organizado transnacional en un vacío institucional. Vista en conjunto, la gestalt del encierro ecuatoriano es una política de abandono.</p>
+          </div>
+          <div class="pais-card">
+            <p class="pais-label">Argentina</p>
+            <p class="pais-texto">El paradigma punitivista en Argentina — endurecimiento de penas desde los 2000, expansión del sistema penitenciario, militarización de fronteras — no redujo el crimen pero sí expandió la población carcelaria un 40% en veinte años. La gestalt: más encierro, mismos problemas, más sufrimiento.</p>
+          </div>
+        </div>
+
+        <div class="ejemplo-bloque">
+          <p class="ejemplo-label">Estudio de Caso / Símbolo</p>
+          <p class="ejemplo-texto">"Este museo es el espejo. Cada sala refleja un ángulo del mismo sistema. El visitante que ha recorrido las seis salas ya no puede ver un titular de 'nuevo motín carcelario' como noticia aislada: ve la estructura. Eso es percepción gestáltica en acción."</p>
+        </div>
+
+        <div class="mensaje-bloque">
+          <p class="mensaje-label">Perspectiva Crítica</p>
+          <p class="mensaje-texto">Salir de este museo con las mismas preguntas con las que entraste sería el mayor fracaso de la exhibición. ¿Qué figura ve ahora, que antes no podía ver?</p>
+        </div>
+      </div>
+
+      <!-- SALA BIBLIOGRAFÍA -->
+      <div class="sala bib-sala" id="sala-6">
+        <div class="sala-header">
+          <div>
+            <p class="sala-num">Sección de Referencia</p>
+            <h2 class="sala-nombre">Bibliografía</h2>
+            <p class="sala-teoria">Referencias en formato APA 7.ª edición</p>
+          </div>
+        </div>
+
+        <p class="bib-subtitle">Obras teóricas fundamentales</p>
+
+        <p class="bib-entry">Bandura, A. (1977). <em>Social learning theory</em>. Prentice Hall.</p>
+        <p class="bib-entry">Christie, N. (1993). <em>Crime control as industry: Towards gulags western style</em>. Routledge.</p>
+        <p class="bib-entry">Festinger, L. (1954). A theory of social comparison processes. <em>Human Relations, 7</em>(2), 117–140. https://doi.org/10.1177/001872675400700202</p>
+        <p class="bib-entry">Festinger, L. (1957). <em>A theory of cognitive dissonance</em>. Stanford University Press.</p>
+        <p class="bib-entry">Gergen, K. J. (1985). The social constructionist movement in modern psychology. <em>American Psychologist, 40</em>(3), 266–275. https://doi.org/10.1037/0003-066X.40.3.266</p>
+        <p class="bib-entry">Goffman, E. (1961). <em>Asylums: Essays on the social situation of mental patients and other inmates</em>. Anchor Books.</p>
+        <p class="bib-entry">Haney, C., Banks, W. C., &amp; Zimbardo, P. G. (1973). Interpersonal dynamics in a simulated prison. <em>International Journal of Criminology and Penology, 1</em>(1), 69–97.</p>
+        <p class="bib-entry">Jodelet, D. (1986). La representación social: Fenómenos, concepto y teoría. En S. Moscovici (Ed.), <em>Psicología social II</em> (pp. 469–494). Paidós.</p>
+        <p class="bib-entry">Martín-Baró, I. (1986). Hacia una psicología de la liberación. <em>Boletín de Psicología, 22</em>, 219–231.</p>
+        <p class="bib-entry">Milgram, S. (1963). Behavioral study of obedience. <em>Journal of Abnormal and Social Psychology, 67</em>(4), 371–378. https://doi.org/10.1037/h0040525</p>
+        <p class="bib-entry">Packer, M. J. (2008). Is Vygotsky relevant? Vygotsky's marxist psychology. <em>Mind, Culture, and Activity, 15</em>(1), 8–31. https://doi.org/10.1080/10749030701798607</p>
+        <p class="bib-entry">Seligman, M. E. P. (1975). <em>Helplessness: On depression, development, and death</em>. W. H. Freeman.</p>
+        <p class="bib-entry">Seligman, M. E. P., &amp; Maier, S. F. (1967). Failure to escape traumatic shock. <em>Journal of Experimental Psychology, 74</em>(1), 1–9. https://doi.org/10.1037/h0024514</p>
+        <p class="bib-entry">Wacquant, L. (2000). <em>Las cárceles de la miseria</em>. Manantial.</p>
+        <p class="bib-entry">Zimbardo, P. G. (2007). <em>The Lucifer effect: Understanding how good people turn evil</em>. Random House.</p>
+
+        <p class="bib-subtitle">Fuentes institucionales y documentos oficiales</p>
+
+        <p class="bib-entry">Centro de Estudios Legales y Sociales. (2020). <em>Informe anual 2020: Derechos humanos en Argentina</em>. CELS. https://www.cels.org.ar</p>
+        <p class="bib-entry">Centro de Estudios Legales y Sociales. (2022). <em>La prisión preventiva como regla: Diagnóstico del sistema penitenciario bonaerense</em>. CELS.</p>
+        <p class="bib-entry">Defensoría del Pueblo del Ecuador. (2022). <em>Informe especial: Crisis del sistema penitenciario ecuatoriano 2021–2022</em>. Defensoría del Pueblo.</p>
+        <p class="bib-entry">Instituto de Estudios Comparados en Ciencias Penales y Sociales. (2021). <em>Reincidencia y reinserción laboral post-carcelaria en la provincia de Buenos Aires</em>. INECIP.</p>
+        <p class="bib-entry">Ministerio de Justicia del Ecuador. (2019). <em>Plan de rehabilitación social 2019–2021</em>. Ministerio de Justicia, Derechos Humanos y Cultos.</p>
+        <p class="bib-entry">Ministerio de Justicia y Derechos Humanos de Argentina. (2022). <em>Informe estadístico del sistema penitenciario federal</em>. Dirección Nacional de Política Criminal.</p>
+        <p class="bib-entry">Servicio Nacional de Atención Integral a Personas Adultas Privadas de la Libertad. (2022). <em>Estadísticas del sistema penitenciario nacional</em>. SNAI.</p>
+        <p class="bib-entry">Universidad Nacional de General San Martín. (2019). <em>Informe de impacto del programa CUSAM: Educación universitaria en contextos de encierro</em>. UNSAM.</p>
+
+        <div class="bib-note">
+          Nota: Las referencias institucionales ecuatorianas y argentinas corresponden a documentos de acceso público. Para verificación, se recomienda consultar directamente los portales oficiales de cada organismo. Formato: American Psychological Association (APA), 7.ª edición (APA, 2020).
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <footer class="museo-footer">
+    <div class="footer-enfoques">
+      Índice: Milgram · Zimbardo · Festinger · Goffman · Seligman · Bandura · Martín-Baró · Gergen · Moscovici · Gestalt
     </div>
-
-    <div class="bottom-bar">
-        <span>Créditos |</span>
-        <span onclick="location.reload()" style="cursor:pointer">Reiniciar</span>
+    <div class="footer-controls">
+      <div class="dots" id="dots"></div>
+      <div class="nav-arrows">
+        <button class="arrow-btn" id="btn-prev" onclick="navSala(-1)" aria-label="Atrás">&lt; Anterior</button>
+        <button class="arrow-btn" id="btn-next" onclick="navSala(1)" aria-label="Siguiente">Siguiente &gt;</button>
+      </div>
     </div>
+  </footer>
 </div>
 
 <script>
-    let currentLevel = 3;
-    let targetSeq = [];
-    let userSeq = [];
-    const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const inputTrigger = document.getElementById('mobile-input-trigger');
+  let salaActual = 0;
+  const totalSalas = 7;
 
-    function setView(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(`screen-${id}`).classList.add('active');
-    }
+  const dotsContainer = document.getElementById('dots');
+  for (let i = 0; i < totalSalas; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => irSala(i);
+    dotsContainer.appendChild(d);
+  }
 
-    function render(containerId, count, data = [], cursor = false) {
-        const div = document.getElementById(containerId);
-        div.innerHTML = '';
-        for (let i = 0; i < count; i++) {
-            const b = document.createElement('div');
-            b.className = 'letter-box';
-            if (cursor && i === userSeq.length) b.classList.add('current-focus');
-            b.textContent = data[i] || "";
-            div.appendChild(b);
-        }
-    }
+  function irSala(n) {
+    const prevEl = document.getElementById('sala-' + salaActual);
+    prevEl.classList.remove('visible');
+    if (salaActual === 6) prevEl.classList.remove('bib-visible');
+    document.querySelectorAll('.nav-btn')[salaActual].classList.remove('active');
+    document.querySelectorAll('.dot')[salaActual].classList.remove('active');
 
-    function focusInput() {
-        inputTrigger.focus();
-    }
+    salaActual = n;
 
-    function initGame() {
-        userSeq = [];
-        targetSeq = [];
-        inputTrigger.value = '';
-        document.getElementById('level-bg').textContent = currentLevel;
-        document.getElementById('retry-btn').textContent = `Reintentar nivel ${currentLevel}`;
-        
-        // Generar secuencia sin repeticiones
-        let available = alpha.split('');
-        for (let i = 0; i < currentLevel; i++) {
-            if (available.length === 0) break; // Límite de 26 letras
-            const randomIndex = Math.floor(Math.random() * available.length);
-            targetSeq.push(available.splice(randomIndex, 1)[0]);
-        }
+    const nextEl = document.getElementById('sala-' + salaActual);
+    nextEl.classList.add('visible');
+    document.querySelectorAll('.nav-btn')[salaActual].classList.add('active');
+    document.querySelectorAll('.dot')[salaActual].classList.add('active');
 
-        render('box-show', currentLevel, targetSeq);
-        setView('show');
+    document.getElementById('btn-prev').disabled = salaActual === 0;
+    document.getElementById('btn-next').disabled = salaActual === totalSalas - 1;
+  }
 
-        setTimeout(() => {
-            render('box-input', currentLevel, [], true);
-            setView('input');
-            focusInput();
-        }, 3000);
-    }
+  function navSala(dir) {
+    const nuevo = salaActual + dir;
+    if (nuevo >= 0 && nuevo < totalSalas) irSala(nuevo);
+  }
 
-    // Manejo de entrada y borrado
-    inputTrigger.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && userSeq.length > 0) {
-            userSeq.pop();
-            render('box-input', currentLevel, userSeq, true);
-        }
-    });
-
-    inputTrigger.addEventListener('input', (e) => {
-        const val = e.target.value.toUpperCase();
-        const char = val.charAt(val.length - 1);
-        
-        if (alpha.includes(char) && userSeq.length < currentLevel) {
-            userSeq.push(char);
-            render('box-input', currentLevel, userSeq, true);
-            
-            if (userSeq.length === currentLevel) {
-                inputTrigger.blur();
-                setTimeout(check, 400);
-            }
-        }
-        e.target.value = ''; // Limpiar para capturar siguiente tecla
-    });
-
-    function check() {
-        if (userSeq.join('') === targetSeq.join('')) {
-            render('box-success', currentLevel, targetSeq);
-            setView('success');
-        } else {
-            render('box-failure-typed', currentLevel, userSeq);
-            render('box-failure-correct', currentLevel, targetSeq);
-            setView('failure');
-        }
-    }
-
-    function advanceLevel() {
-        if (currentLevel < 26) {
-            currentLevel++;
-            initGame();
-        } else {
-            alert("¡Has alcanzado el límite máximo de letras únicas!");
-            location.reload();
-        }
-    }
-
-    window.onload = initGame;
+  irSala(0);
 </script>
+
 </body>
 </html>
